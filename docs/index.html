@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finding Real Quick-Wins in Near-Page-1 Content — Farhan</title>
+<meta name="description" content="Does a volume-only ranking rule actually find underperforming near-page-1 content? A validated model comparison on 30,000 real SEO content rows.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F6F4;
+    --panel:#EAEBE6;
+    --ink:#1C2321;
+    --ink-soft:#4B524F;
+    --line:#D7D9D3;
+    --signal:#1B6F5C;
+    --signal-soft:#DCEAE6;
+    --baseline:#B04A3B;
+    --baseline-soft:#F3E3E0;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:700px;margin:0 auto;padding:0 24px;}
+  .wide{max-width:880px;margin:0 auto;padding:0 24px;}
+  header.masthead{padding:72px 0 0;}
+  .kicker{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+    letter-spacing:0.02em;
+    margin:0 0 18px;
+  }
+  h1.title{
+    font-family:"Newsreader",Georgia,serif;
+    font-weight:500;
+    font-size:clamp(32px,5vw,46px);
+    line-height:1.15;
+    margin:0 0 20px;
+    max-width:15ch;
+  }
+  .byline{
+    font-size:15px;
+    color:var(--ink-soft);
+    margin:0 0 48px;
+    padding-bottom:40px;
+    border-bottom:1px solid var(--line);
+  }
+  .byline a{color:var(--ink);}
+  .abstract{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:28px 30px;
+    margin:0 0 8px;
+  }
+  .abstract .label{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12px;
+    color:var(--signal);
+    font-weight:600;
+    margin:0 0 12px;
+  }
+  .abstract p{margin:0;font-size:16px;}
+  .headline-result{
+    margin:56px auto 64px;
+    text-align:left;
+    padding:36px 0;
+  }
+  .headline-result .stat{
+    font-family:"IBM Plex Mono",monospace;
+    font-weight:600;
+    font-size:clamp(40px,7vw,64px);
+    color:var(--signal);
+    line-height:1;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .headline-result .stat .arrow{color:var(--ink-soft);font-size:0.6em;}
+  .headline-result .stat .from{color:var(--baseline);}
+  .headline-result .cap{
+    margin-top:14px;
+    font-size:15px;
+    color:var(--ink-soft);
+    max-width:52ch;
+  }
+  section{margin:0 0 56px;}
+  section h2{
+    font-family:"Newsreader",Georgia,serif;
+    font-weight:500;
+    font-size:26px;
+    margin:0 0 6px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--line);
+  }
+  section h2 .num{color:var(--signal);font-variant-numeric:tabular-nums;margin-right:10px;}
+  section h3{
+    font-family:"IBM Plex Sans",sans-serif;
+    font-weight:600;
+    font-size:16px;
+    margin:28px 0 10px;
+  }
+  section p{margin:0 0 16px;font-size:16px;}
+  section ul, section ol{margin:0 0 16px;padding-left:22px;}
+  section li{margin:0 0 8px;font-size:16px;}
+  .mono-num{font-family:"IBM Plex Mono",monospace;font-weight:500;}
+  figure{margin:28px 0;}
+  figure img{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:3px;background:#fff;}
+  figcaption{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:10px;
+    max-width:60ch;
+  }
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px;}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);}
+  th{font-weight:600;font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-soft);}
+  td.num, th.num{font-family:"IBM Plex Mono",monospace;text-align:right;}
+  .callout{
+    border-left:3px solid var(--baseline);
+    background:var(--baseline-soft);
+    padding:18px 22px;
+    border-radius:0 3px 3px 0;
+    margin:20px 0;
+  }
+  .callout p{margin:0 0 10px;font-size:15px;}
+  .callout p:last-child{margin-bottom:0;}
+  .callout.no-go{border-left-color:var(--ink);background:var(--panel);}
+  code, .code-block{font-family:"IBM Plex Mono",monospace;font-size:13.5px;}
+  .code-block{
+    background:var(--ink);
+    color:var(--paper);
+    padding:18px 20px;
+    border-radius:3px;
+    overflow-x:auto;
+    line-height:1.7;
+    white-space:pre-wrap;
+    margin:16px 0;
+  }
+  .repo-links{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin:16px 0;
+  }
+  .repo-links a{color:var(--signal);text-decoration:none;border-bottom:1px solid var(--signal-soft);}
+  .repo-links a:hover{border-bottom-color:var(--signal);}
+  footer{
+    border-top:1px solid var(--line);
+    padding:32px 0 72px;
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+  footer a{color:var(--ink);}
+  .toc{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px 18px;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin:0 0 56px;
+    padding-bottom:24px;
+    border-bottom:1px solid var(--line);
+  }
+  .toc a{color:var(--ink-soft);text-decoration:none;}
+  .toc a:hover{color:var(--signal);}
+  @media (max-width:640px){
+    header.masthead{padding:44px 0 0;}
+    .abstract{padding:22px 20px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="kicker">FlyRank ML Internship — Capstone Research</p>
+    <h1 class="title">Does Ranking by Traffic Volume Actually Find Broken Pages?</h1>
+    <p class="byline">
+      Mochammad Farhan · Machine Learning track ·
+      <a href="https://github.com/faja27/flyrank-ml-internship" target="_blank" rel="noopener">github.com/faja27/flyrank-ml-internship</a>
+    </p>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="toc">
+    <a href="#introduction">Introduction</a>
+    <a href="#data">Data</a>
+    <a href="#methodology">Methodology</a>
+    <a href="#results">Results</a>
+    <a href="#limitations">Limitations</a>
+    <a href="#recommendations">Recommendations</a>
+    <a href="#reproducibility">Reproducibility</a>
+    <a href="#acknowledgments">Acknowledgments</a>
+  </nav>
+
+  <div class="abstract">
+    <p class="label">Abstract</p>
+    <p>
+      FlyRank's own product flags pages for review with hand-tuned SQL rules like <code>is_quick_win</code> —
+      a shorthand for "close to page 1, gets a lot of traffic, fix it first." Using 30,000 rows of real
+      90-day SEO performance data, restricted to that same slice of near-page-1, high-demand pages, I tested
+      whether a rule shaped like that flag actually finds pages that are genuinely underperforming their own
+      position's benchmark click-through rate. It doesn't: ranked by volume alone, precision sits within a
+      few points of chance. A logistic regression and a random forest, trained on content and engagement
+      signals instead of volume, and validated on a client-grouped holdout split, lift precision@50 from 0.68
+      to as high as 0.94. The output is a reviewed, human-in-the-loop action queue with explicit
+      no-automation rules, not a replacement for FlyRank's flag or a live pipeline.
+    </p>
+  </div>
+
+  <div class="headline-result">
+    <div class="stat">
+      <span class="from">0.68</span><span class="arrow">→</span><span>0.94</span>
+    </div>
+    <p class="cap">
+      Precision@50 for finding genuinely underperforming near-page-1 pages: a volume-only baseline (0.68,
+      barely above the 0.68 base rate) vs. a random forest trained on content and engagement signals (0.94),
+      both measured on the same client-grouped holdout split.
+    </p>
+  </div>
+
+  <section id="introduction">
+    <h2><span class="num">1</span>Introduction</h2>
+    <p>
+      A common content-ops shortcut treats "close to page 1, gets a lot of impressions" as the review queue
+      for SEO fixes. It's an easy rule to write and easy to defend — bigger pages, bigger upside. But volume
+      says nothing about whether a page is actually broken. A page can sit at position 6 with huge impressions
+      and a perfectly healthy click-through rate; ranking it above a smaller page that's quietly
+      underperforming wastes a reviewer's time on the wrong candidate.
+    </p>
+    <p>
+      This paper asks a narrower, checkable question: among pages already close to page 1 with real search
+      demand behind them, which ones are genuinely underperforming their position's own benchmark
+      click-through rate — and can a model that reads content and engagement signals find them better than a
+      rule that only reads impression volume? The answer supports one decision: what a content team reviews
+      first next Monday.
+    </p>
+    <h3>The case study behind the question</h3>
+    <p>
+      This isn't an abstract exercise. FlyRank's live app already makes exactly this kind of call for real
+      content teams — hand-tuned SQL rules compute flags like <code>health_score</code>,
+      <code>needs_ctr_fix</code>, <code>is_quick_win</code>, and a combined <code>priority_score</code> that
+      decide which pages a team sees at the top of their queue each week. <code>is_quick_win</code>, in
+      particular, is shaped around exactly the volume-first logic this paper tests: a page close to page 1
+      with a lot of traffic gets flagged as a quick win, on the assumption that size alone means it's worth
+      fixing.
+    </p>
+    <p>
+      A team only has so many review-hours a week. If a flag built on volume alone is only as good as
+      chance at finding pages that are <em>actually</em> broken, half of that limited review time goes to
+      pages that didn't need it — while genuinely underperforming pages with smaller (but real) audiences
+      wait. That's the operational stakes behind the number in the box above.
+    </p>
+  </section>
+
+  <section id="data">
+    <h2><span class="num">2</span>Data</h2>
+    <p>
+      The analysis uses the anonymized FlyRank ML Internship starter release
+      (<code>content_refresh_anonymized.csv</code>) — 30,000 content rows, each with trailing 90-day search
+      performance (impressions, clicks, engagement) and static content attributes (word count, competition,
+      content type, search intent), pseudonymously keyed by client and content ID.
+    </p>
+    <p>
+      The analysis lane is restricted to <span class="mono-num">12,701</span> rows
+      (<span class="mono-num">42.3%</span> of the release) — pages at position 4-20 (<code>page_1</code> or
+      <code>striking</code> distance) with at least moderate search demand
+      (<code>impression_tier</code> ≥ <code>moderate</code>). The remaining 57.7% — deep pages or pages with
+      no meaningful demand — is out of scope for this lane by design, not by omission.
+    </p>
+    <h3>Excluded on purpose</h3>
+    <ul>
+      <li><code>ctr</code> and <code>clicks_90d</code> — these define the label; using them as inputs would be circular.</li>
+      <li><code>trend_direction</code> and <code>trend_pct</code>, and the 30-day comparison windows beneath them — label-derived conventions, excluded regardless of lane.</li>
+      <li><code>provider_used</code> / <code>model_used</code> — flagged in the source data dictionary as not model features.</li>
+      <li>Client and content IDs — used only for grouping the train/test split, never as model inputs.</li>
+    </ul>
+    <p>
+      No client names, raw search queries, or URLs appear anywhere in this work; the source release's IDs are
+      already anonymized hashes.
+    </p>
+  </section>
+
+  <section id="methodology">
+    <h2><span class="num">3</span>Methodology</h2>
+    <h3>Label</h3>
+    <p>
+      A candidate is labeled <span class="mono-num">1</span> if its own click-through rate falls below the
+      demand-weighted CTR benchmark for the <code>page_1</code>+<code>striking</code> pool combined
+      (<span class="mono-num">sum(clicks) / sum(impressions)</span>, not an average of per-row rates) — an
+      observed, non-circular target, not a ranking invented after the fact.
+    </p>
+    <h3>Baseline</h3>
+    <p>
+      Rank candidates by <code>impressions_90d</code> alone — the volume-first rule described in the
+      introduction. One line of logic, fully transparent, and the number every model below has to beat.
+    </p>
+    <h3>Model</h3>
+    <p>
+      Logistic regression and random forest, trained on 13 numeric and 7 categorical features spanning
+      content attributes (word count, competition, content type, intent), engagement (scroll rate,
+      engagement rate, AI-traffic share), and the position/demand tier the lane is defined by. Both models
+      come from the same toolkit row — "yes/no with an observed label" — with the simpler model trained first
+      so added complexity has to earn its place in the results.
+    </p>
+    <h3>Validation design</h3>
+    <p>
+      Train/test split via <code>GroupShuffleSplit</code> on <code>client_id</code> (80/20, seed 42) rather
+      than a plain random split. Different clients have different sites and content styles; a random split
+      risks letting the model partly recognize a client's house style instead of learning transferable
+      signal. Zero client overlap between train and test was confirmed directly.
+    </p>
+    <h3>Leakage checks</h3>
+    <p>
+      The feature set was checked against known label-source and product-flag columns (none present), and
+      the evaluation harness itself was verified by deliberately re-introducing <code>ctr</code> as a feature
+      — AUC jumped to 1.0 as expected, confirming the harness would actually catch a real leak rather than
+      silently passing one through.
+    </p>
+  </section>
+
+  <section id="results">
+    <h2><span class="num">4</span>Results</h2>
+    <p>
+      All three rankings were evaluated on the same held-out client split, at the same values of K, with the
+      base rate reported alongside every number below — a precision score means little without it.
+    </p>
+    <table>
+      <thead>
+        <tr><th>K</th><th class="num">base rate</th><th class="num">baseline (volume)</th><th class="num">logistic regression</th><th class="num">random forest</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>50</td><td class="num">0.681</td><td class="num">0.680</td><td class="num">0.900</td><td class="num">0.940</td></tr>
+        <tr><td>100</td><td class="num">0.681</td><td class="num">0.680</td><td class="num">0.910</td><td class="num">0.890</td></tr>
+        <tr><td>200</td><td class="num">0.681</td><td class="num">0.660</td><td class="num">0.865</td><td class="num">0.915</td></tr>
+      </tbody>
+    </table>
+    <figure>
+      <img src="figures/capstone_precision_comparison.png" alt="Bar chart comparing precision at K=50, 100, and 200 for the baseline, logistic regression, and random forest, against the base rate line.">
+      <figcaption>The baseline rule hugs the base rate at every K — it is barely distinguishable from ranking candidates at random. Both models sit well above it.</figcaption>
+    </figure>
+    <p>
+      By ROC-AUC, the picture is more modest: logistic regression scores 0.626 and random forest 0.698 — real
+      but unremarkable discrimination across the whole population. The two metrics tell different, both true
+      stories: the models are not excellent at classifying every candidate, but they are good at separating
+      the extremes, which is exactly what a short review queue needs.
+    </p>
+    <p>
+      A direct check of the validation design's honesty: refitting the random forest on a plain random split
+      (ignoring <code>client_id</code>) raised its AUC from 0.698 to 0.758 — a real, if moderate, inflation
+      from letting the model partly learn client identity instead of generalizable signal. The client-grouped
+      number above is the one that should be trusted.
+    </p>
+  </section>
+
+  <section id="limitations">
+    <h2><span class="num">5</span>Limitations</h2>
+    <div class="callout">
+      <p><strong>Cross-sectional, not causal.</strong> This work ranks who looks like an opportunity in one
+      snapshot. It does not claim that fixing a flagged page will produce a specific traffic lift — that
+      claim would need a controlled experiment.</p>
+      <p><strong>Narrow lane, by design.</strong> The model covers 42.3% of the portfolio. It says nothing
+      about deep pages or pages with no meaningful search demand.</p>
+      <p><strong>Validated on a handful of clients.</strong> 23 training clients, 6 held out. A genuinely new
+      client is untested, not just "less certain" — the grouping check above shows client identity carries
+      real, learnable signal if the model is allowed to use it.</p>
+      <p><strong>Modest discrimination, strong ranking.</strong> An AUC of 0.63-0.70 should not be read as
+      "the model explains the data well," even though its precision@K is strong.</p>
+      <p><strong>One dataset, one split.</strong> Numbers above come from a single seed and a single time
+      window; a different sample or a later data pull could move them somewhat.</p>
+    </div>
+  </section>
+
+  <section id="recommendations">
+    <h2><span class="num">6</span>Ranked recommendations</h2>
+    <p>
+      The random forest's predicted probability sorts every candidate into one of three archetypes, ranked
+      within archetype by <span class="mono-num">probability × impressions_90d</span> — likelihood of being a
+      real opportunity, weighted by the size of the audience that would benefit.
+    </p>
+    <table>
+      <thead>
+        <tr><th>archetype</th><th>probability</th><th>action</th><th class="num">actual hit rate</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>quick_win_high_confidence</code></td><td>≥ 0.70</td><td>prioritize for a fix this cycle</td><td class="num">84.0%</td></tr>
+        <tr><td><code>quick_win_borderline</code></td><td>0.40 – 0.70</td><td>queue for human review</td><td class="num">53.1%</td></tr>
+        <tr><td><code>already_efficient</code></td><td>&lt; 0.40</td><td>no action, monitor only</td><td class="num">9.2%</td></tr>
+      </tbody>
+    </table>
+    <figure>
+      <img src="figures/capstone_archetype_calibration.png" alt="Bar chart showing the actual underperformance rate for each of the three archetypes, rising from about 9% to 53% to 84%.">
+      <figcaption>Each archetype's actual hit rate lands close to its probability band — a directional sign the model's confidence is calibrated, not just confident.</figcaption>
+    </figure>
+    <h3>The decay/refresh insight</h3>
+    <p>
+      Within the lane, underperformance climbs steadily with content age — 41.8% for content under 90 days,
+      rising to 78.3% for content over a year old.
+    </p>
+    <figure>
+      <img src="figures/capstone_decay_refresh.png" alt="Bar chart showing underperformance rate rising from about 42% for content under 90 days old to 78% for content over 365 days old.">
+      <figcaption>A concrete, age-based case for a recurring refresh cadence in this lane, not just a one-time push through the current queue.</figcaption>
+    </figure>
+    <div class="callout no-go">
+      <p><strong>No-go list.</strong> Never auto-publish or auto-edit content from this queue. Never treat
+      <code>already_efficient</code> as grounds to deprioritize or suppress a page. Never act on
+      <code>quick_win_borderline</code> without a human review — its hit rate sits within three points of a
+      coin flip. Never present this ranking as a client-facing traffic guarantee.</p>
+    </div>
+  </section>
+
+  <section id="reproducibility">
+    <h2><span class="num">7</span>Reproducibility</h2>
+    <p>
+      Every number in this paper is produced by <code>work/notebooks/capstone.ipynb</code>, which reproduces
+      the full pipeline — lane definition, label, features, grouped split, both models, leakage checks, and
+      every figure above — from the raw CSV in one run. Random seed <span class="mono-num">42</span>
+      throughout.
+    </p>
+    <div class="code-block"># from a fresh clone
+git clone https://github.com/faja27/flyrank-ml-internship
+cd flyrank-ml-internship
+pip install -r requirements.txt
+jupyter nbconvert --to notebook --execute work/notebooks/capstone.ipynb</div>
+    <p>The full week-by-week trail, in order:</p>
+    <div class="repo-links">
+      <a href="https://github.com/faja27/flyrank-ml-internship/blob/main/work/notebooks/w04_baseline_score.ipynb" target="_blank" rel="noopener">w04_baseline_score.ipynb — the volume-only baseline</a>
+      <a href="https://github.com/faja27/flyrank-ml-internship/blob/main/work/notebooks/w05_model.ipynb" target="_blank" rel="noopener">w05_model.ipynb — logistic regression + random forest</a>
+      <a href="https://github.com/faja27/flyrank-ml-internship/blob/main/work/notebooks/w06_validation_audit.ipynb" target="_blank" rel="noopener">w06_validation_audit.ipynb — grouped-split audit + leakage test</a>
+      <a href="https://github.com/faja27/flyrank-ml-internship/blob/main/work/notebooks/w07_action_playbook.ipynb" target="_blank" rel="noopener">w07_action_playbook.ipynb — archetypes + the action queue</a>
+      <a href="https://github.com/faja27/flyrank-ml-internship/blob/main/work/notebooks/capstone.ipynb" target="_blank" rel="noopener">capstone.ipynb — everything above, in one reproducible run</a>
+    </div>
+    <p>
+      Metrics are committed as receipts at
+      <code>work/outputs/capstone_metrics.json</code>; the ranked queue CSV regenerates on every run rather
+      than living in git, by the repo's own data-safety convention.
+    </p>
+  </section>
+
+  <footer id="acknowledgments">
+    <p>
+      Built on the FlyRank ML Internship dataset — <a href="https://flyrank.ai" target="_blank" rel="noopener">flyrank.ai</a>.
+    </p>
+    <p>Mochammad Farhan · <a href="https://github.com/faja27" target="_blank" rel="noopener">github.com/faja27</a></p>
+  </footer>
+</div>
+
+</body>
+</html>
