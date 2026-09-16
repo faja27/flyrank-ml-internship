@@ -1,0 +1,58 @@
+{
+  "lane": "volume_quick_win",
+  "total_rows": 30000,
+  "lane_rows": 12701,
+  "lane_coverage_pct": 0.423,
+  "benchmark_ctr_pct": 0.35,
+  "test_base_rate": 0.681,
+  "precision_at_k": {
+    "50": {
+      "base_rate": 0.681,
+      "baseline_volume_rule": 0.68,
+      "logistic_regression": 0.9,
+      "random_forest": 0.94
+    },
+    "100": {
+      "base_rate": 0.681,
+      "baseline_volume_rule": 0.68,
+      "logistic_regression": 0.91,
+      "random_forest": 0.89
+    },
+    "200": {
+      "base_rate": 0.681,
+      "baseline_volume_rule": 0.66,
+      "logistic_regression": 0.865,
+      "random_forest": 0.915
+    }
+  },
+  "auc": {
+    "logistic_regression": 0.626,
+    "random_forest": 0.698
+  },
+  "auc_grouping_check": {
+    "naive_random_split": 0.758,
+    "grouped_split": 0.698
+  },
+  "archetype_hit_rates": {
+    "already_efficient": 0.092,
+    "quick_win_borderline": 0.531,
+    "quick_win_high_confidence": 0.84
+  },
+  "archetype_sizes": {
+    "already_efficient": 284,
+    "quick_win_borderline": 5153,
+    "quick_win_high_confidence": 7264
+  },
+  "decay_refresh_by_age": {
+    "0-90d": 0.418,
+    "91-180d": 0.669,
+    "181-365d": 0.687,
+    "365d+": 0.783
+  },
+  "clients": {
+    "total": 29,
+    "train": 23,
+    "test": 6
+  },
+  "seed": 42
+}
